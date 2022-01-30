@@ -15,6 +15,63 @@ module Api
         end
       end
 
+      def status
+        solicitude = Solicitude.where(id: params[:id]).first
+        update_status(solicitude)
+ 
+        if solicitude     
+          render json: { status: solicitude.status, url: solicitude.status == "completed" ? "http://localhost:3000/api/v1/download_pdf?solicitud_id=#{solicitude.id}" : "" }, status: :ok
+        else
+          render json: { errors: solicitude.errors }, status: :unprocessable_entity
+        end
+      end
+
+      def download_pdf 
+        send_file "#{Rails.root}/public/zips/#{params[:solicitud_id]}.zip", type: "application/zip", x_sendfile: true 
+      end
+
+      private
+
+      def update_status(solicitude)
+
+        return solicitude unless (solicitude.status != "completed" && solicitude.status != "error")
+
+          if solicitude.status = 'processing'
+            solicitude.status = 'completed'
+            create_zip(solicitude)
+          else
+            solicitude.status = 'error'
+          end
+          if solicitude.save
+            return solicitude
+          else
+            return nil
+          end 
+       
+      end
+
+      def create_zip(solicitude)
+
+        folder_to_zip = "#{Rails.root}/public/pdfs"
+        input_filenames = []
+        solicitude.shippings.each do |ship|
+          file = "#{solicitude.id}-#{ship.id}.pdf"
+          input_filenames << file
+        end
+
+        zipfile_name = "#{Rails.root}/public/zips/#{solicitude.id}.zip"       
+
+        Zip::File.open(zipfile_name, create: true) do |zipfile|
+          input_filenames.each do |filename|
+            # Two arguments:
+            # - The name of the file as it will appear in the archive
+            # - The original file, including the path to find it
+            zipfile.add(filename, File.join(folder_to_zip, filename))
+          end
+          zipfile.get_output_stream("myFile") { |f| f.write "myFile contains just this" }
+        end
+
+      end
 
       def crea_solicitud_con_shippings
         nueva_solicitud = Solicitude.new(fecha: Date.today, tracking_number: '11111', status: 'pending')
@@ -23,8 +80,6 @@ module Api
         end
         return nueva_solicitud
       end
-
-      private
 
       def get_data_from_params(nueva_solicitud, i)
 
