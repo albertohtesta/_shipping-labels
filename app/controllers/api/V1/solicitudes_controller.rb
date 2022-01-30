@@ -7,23 +7,31 @@ module Api
       skip_before_action :verify_authenticity_token
 
       def create
-        solicitude = crea_solicitud_con_shippings()
-        if solicitude.save      
-          render json: { message: "Created", id_solicitud: solicitude.id }, status: :created
+        # primer request
+        if params[:_json] != nil && params[:_json].length > 0
+          solicitude = crea_solicitud_con_shippings()
+          if solicitude.save      
+            render json: { message: "Created", id_solicitud: solicitude.id }, status: :created
+          else
+            render json: { errors: solicitude.errors }, status: :unprocessable_entity
+          end
         else
-          render json: { errors: solicitude.errors }, status: :unprocessable_entity
+          render json: { errors: 'No data' }, status: :unprocessable_entity
         end
       end
 
       def status
         # 2o. request da el estaus y la url
         solicitude = Solicitude.where(id: params[:id]).first
-        update_status(solicitude)
- 
-        if solicitude     
-          render json: { status: solicitude.status, url: solicitude.status == "completed" ? "http://localhost:3000/api/v1/download_pdf?solicitud_id=#{solicitude.id}" : "" }, status: :ok
+        if solicitude
+          update_status(solicitude)
+           if solicitude     
+            render json: { status: solicitude.status, url: solicitude.status == "completed" ? "http://localhost:3000/api/v1/download_pdf?solicitud_id=#{solicitude.id}" : "" }, status: :ok
+          else
+            render json: { errors: solicitude.errors }, status: :unprocessable_entity
+          end
         else
-          render json: { errors: solicitude.errors }, status: :unprocessable_entity
+          render json: { errors: "No existe la solicitud" }, status: :unprocessable_entity
         end
       end
 
@@ -85,10 +93,16 @@ module Api
 
       def get_data_from_params(nueva_solicitud, i)
 
-          carrier_id = Carrier.find_by(name: params[:_json][i][:carrier]).id
-          if !carrier_id
-            carrier_id = 1
+          #carrier_id = Carrier.find_by(name: params[:_json][i][:carrier]).id
+          if !(params[:_json][i][:carrier])
+            carrier_id = 2
+          else
+            carrier_id = Carrier.where(name: params[:_json][i][:carrier]).first.id
+            if !carrier_id
+              carrier_id = 2
+            end
           end
+
           name_from = params[:_json][i][:shipment][:address_from][:name]
           street_from = params[:_json][i][:shipment][:address_from][:street1]
           city_from = params[:_json][i][:shipment][:address_from][:city]
