@@ -12,7 +12,6 @@ module Interfaceable
   def downloadPdf(shipping)
         solicitude = shipping.solicitude
         Down.download(shipping.label_url, destination: "#{Rails.root}/public/pdfs/#{solicitude.id}-#{shipping.id}.pdf")
-        #solicitude.label_pdfs.attach(io: File.open("#{Rails.root}/public/pdfs/#{solicitude.id}-#{shipping.id}.pdf"), filename: "#{solicitude.id}-#{shipping.id}.pdf")
   end
 
   def check_response_and_save_shippings_status(response, shipping)

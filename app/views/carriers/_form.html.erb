@@ -1,0 +1,19 @@
+<%= render 'shared/errors', obj: @carrier %>
+<div class="container">
+	<%= form_for @carrier do |f|  %>
+      <div class="mb-3">
+	  	<%= f.label :name, 'Nombre', class: 'form-label' %>
+	  	<%= f.text_field :name, class: 'form-control' %>
+	  </div>
+	  <div class="mb-3">
+	  	<%= f.label :endpoint, 'Endpoint', class: 'form-label' %>
+	  	<%= f.text_field :endpoint, class: 'form-control' %>
+	  </div>
+	  <div class="mb-3">
+	  	<%= f.label :token, 'Token', class: 'form-label' %>
+	  	<%= f.text_field :token, class: 'form-control' %>
+	  </div>
+
+	  <%= f.submit (@carrier.new_record? ? 'Registrar': 'Actualizar'), class: 'btn btn-primary' %>
+	<% end %>
+</div>

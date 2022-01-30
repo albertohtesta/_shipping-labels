@@ -36,8 +36,13 @@ module Api
       end
 
       def download_pdf
-        # 3er request descarga el zip 
-        send_file "#{Rails.root}/public/zips/#{params[:solicitud_id]}.zip", type: "application/zip", x_sendfile: true 
+        # 3er request descarga el zip
+        solicitude = Solicitude.where(id: params[:solicitud_id]).first
+        if solicitude
+          send_file "#{Rails.root}/public/zips/#{params[:solicitud_id]}.zip", type: "application/zip", x_sendfile: true
+        else
+          render json: { errors: "No existe la solicitud" }, status: :unprocessable_entity
+        end
       end
 
       private
@@ -93,13 +98,12 @@ module Api
 
       def get_data_from_params(nueva_solicitud, i)
 
-          #carrier_id = Carrier.find_by(name: params[:_json][i][:carrier]).id
           if !(params[:_json][i][:carrier])
-            carrier_id = 2
+            carrier = Carrier.where(name: "fake_carrier").first
           else
-            carrier_id = Carrier.where(name: params[:_json][i][:carrier]).first.id
-            if !carrier_id
-              carrier_id = 2
+            carrier = Carrier.where(name: params[:_json][i][:carrier]).first
+            if !carrier
+              carrier = Carrier.where(name: "fake_carrier").first
             end
           end
 
@@ -125,7 +129,7 @@ module Api
           weight = dimensions[0][:weight]
           weight_unit = dimensions[0][:weight_unit]
           # añade el shipping a la solicitud
-          ship = nueva_solicitud.shippings.new(carrier_id: carrier_id, name_from: name_from, street_from: street_from, city_from: city_from, province_from: province_from, postal_code_from: postal_code_from, countr_code_from: countr_code_from, name_to: name_to, street_to: street_to, city_to: city_to, province_to: province_to, postal_code_to: postal_code_to, countr_code_to: countr_code_to, length: length, width: width, height: height, dimensions_unit: dimensions_unit, weight: weight, weight_unit: weight_unit)
+          ship = nueva_solicitud.shippings.new(carrier: carrier, name_from: name_from, street_from: street_from, city_from: city_from, province_from: province_from, postal_code_from: postal_code_from, countr_code_from: countr_code_from, name_to: name_to, street_to: street_to, city_to: city_to, province_to: province_to, postal_code_to: postal_code_to, countr_code_to: countr_code_to, length: length, width: width, height: height, dimensions_unit: dimensions_unit, weight: weight, weight_unit: weight_unit)
           return nueva_solicitud
 
       end

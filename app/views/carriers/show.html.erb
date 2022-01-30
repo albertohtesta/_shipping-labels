@@ -1,0 +1,19 @@
+<div class="contanier">
+	  <p class="float-end">
+	  	[<%= link_to 'Editar', edit_carrier_path(@carrier) %>]
+	  </p>
+	<p>
+		<%= render 'shared/content_title', title: @carrier.name %>
+	</p>
+	<p>
+		<%= @carrier.name %>
+	</p>
+	<p>
+		<%= @carrier.endpoint %>
+	</p>
+	<p>
+		<%= @carrier.token %>
+	</p>
+	<hr>
+
+</div>

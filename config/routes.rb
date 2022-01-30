@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  root to: "main#index"
-
+  root to: "solicitudes#index"
+  resources :carriers
   resources :solicitudes, only: [:index, :create, :show] do
     resources :shippings, only: [:index] do
     end
