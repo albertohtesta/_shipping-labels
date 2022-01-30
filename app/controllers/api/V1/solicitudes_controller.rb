@@ -16,6 +16,7 @@ module Api
       end
 
       def status
+        # 2o. request da el estaus y la url
         solicitude = Solicitude.where(id: params[:id]).first
         update_status(solicitude)
  
@@ -26,7 +27,8 @@ module Api
         end
       end
 
-      def download_pdf 
+      def download_pdf
+        # 3er request descarga el zip 
         send_file "#{Rails.root}/public/zips/#{params[:solicitud_id]}.zip", type: "application/zip", x_sendfile: true 
       end
 
