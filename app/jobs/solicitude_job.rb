@@ -1,5 +1,5 @@
 class SolicitudeJob < ApplicationJob
-  require "open-uri"
+
   require "down"
   queue_as :default
   include Interfaceable
