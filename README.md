@@ -263,8 +263,8 @@ producción.</p>
 para para servir bootstrap, en producción es mejor integrar
 bootstrap en la aplicación.</p>
 <p style="line-height: 108%; margin-bottom: 0.11in">Se podría haber
-usado Active Storage, para asociar los archivos pdfs y zips, pero no
+usado Active Storage, para asociar los archivos pdfs y zips, pero 
 se decidió no hacerlo, porque la app, se resolvió así y no se tuvo
-complicación al hacerlo y no fue completamente necesario.</p>
+complicación, por lo que ya no fue completamente necesario.</p>
 </body>
 </html>
